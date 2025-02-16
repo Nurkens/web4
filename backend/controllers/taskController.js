@@ -22,21 +22,27 @@ class taskController{
         }
     
     }
-    async createTask(req,res){
-        try{
-            const {title,description} = req.body;
-            if(!title || !description){
-                return res.status(400).json({message:"please fill all "});
+    async createTask(req, res) {
+        try {
+            const { title, description } = req.body;
+            if (!title || !description) {
+                return res.status(400).json({ message: "Please fill all fields" });
             }   
-            const task = new Tasks({title,description});
+
+            const userId = req.user?.id; 
+            if (!userId) {
+                return res.status(401).json({ message: "User not authorized" });
+            }
+
+            const task = new Tasks({ title, description, userId });
             await task.save();
-            return res.status(200).json({message:"the task was created",task});
-
-
-        }catch(e){
+            return res.status(201).json({ message: "Task created", task });
+        } catch (e) {
             console.log(e);
+            return res.status(500).json({ message: "Internal server error" });
         }
     }
+
     async updateTask(req,res){
         try{
             const {title,description} = req.body;
